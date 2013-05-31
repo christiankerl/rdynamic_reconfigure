@@ -1,0 +1,16 @@
+<package>
+  <description brief="rdynamic_reconfigure">
+
+     rdynamic_reconfigure
+
+  </description>
+  <author>christiankerl</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rdynamic_reconfigure</url>
+  <depend package="roscpp"/>
+  <depend package="dynamic_reconfigure"/>
+
+</package>
+
+
