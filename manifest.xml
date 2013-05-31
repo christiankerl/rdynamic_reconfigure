@@ -4,8 +4,8 @@
      rdynamic_reconfigure
 
   </description>
-  <author>christiankerl</author>
-  <license>BSD</license>
+  <author>Christian Kerl</author>
+  <license>MIT</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rdynamic_reconfigure</url>
   <depend package="roscpp"/>
