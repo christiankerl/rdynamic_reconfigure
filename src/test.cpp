@@ -58,11 +58,14 @@ int main(int argc, char **argv) {
 
   Configuration config;
 
+  EnumConstant c1, c2, c3;
+
   config
   .add(NewParam<int>("test_int", t.v0).setDescription("test parameter").setInterval(0, 10))
   .add(NewParam<double>("test_double", t.v1).setDescription("test parameter").setInterval(-10.0, 10.0))
   .add(NewParam<bool>("test_bool", t.v2).setDescription("test parameter").setDefault(true))
-  .add(NewParam<std::string>("test_string", t.v3).setDescription("test parameter").setDefault("hello"));
+  .add(NewParam<std::string>("test_string", t.v3).setDescription("test parameter").setDefault("hello"))
+  .add(NewEnumParam("test_enum").add("c1", c1).add("c2", c2).add("c3", c3));
 
   rdynamic_reconfigure::Server server(nh, config);
   server.setCallback(boost::bind(&TestNode::onConfig, &t, _1));

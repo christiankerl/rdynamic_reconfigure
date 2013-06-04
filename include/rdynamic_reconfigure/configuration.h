@@ -156,10 +156,105 @@ public:
     }
   }
 
-private:
+protected:
   T value_, min_, max_, default_;
 };
 
+// --------------------  enums  ----------------------------------
+class EnumParam;
+
+class NewEnumParam;
+
+class EnumConstant
+{
+public:
+  friend class EnumParam;
+
+  int id() const
+  {
+    return id_;
+  }
+private:
+  int id_;
+};
+
+class EnumParam : public Param<int>
+{
+public:
+  friend class NewEnumParam;
+
+  EnumParam() :
+    next_id_(1)
+  {
+    default_ = next_id_;
+    min_ = next_id_;
+  }
+
+  virtual ~EnumParam() {}
+
+  virtual void toParamDescriptionMessage(dynamic_reconfigure::ParamDescription& msg)
+  {
+    Param<int>::toParamDescriptionMessage(msg);
+    msg.edit_method = "";
+  }
+
+  void add(const std::string& name, EnumConstant& value)
+  {
+    value.id_ = next_id_++;
+    max_ = value.id_;
+
+    EnumEntry e;
+    e.id = value.id_;
+    e.name = name;
+    entries_.push_back(e);
+  }
+private:
+  struct EnumEntry
+  {
+    std::string name;
+    int id;
+  };
+
+  typedef std::vector<EnumEntry> EntryVector;
+
+  int next_id_;
+  EntryVector entries_;
+};
+
+class NewEnumParam
+{
+public:
+  NewEnumParam(std::string name) :
+    param_(new EnumParam())
+  {
+    param_->name_ = name;
+  }
+
+  NewEnumParam& setDescription(const std::string& description)
+  {
+    param_->description_ = description;
+    return *this;
+  }
+
+  NewEnumParam& setDefault(const EnumConstant& value)
+  {
+    param_->default_ = value.id();
+    return *this;
+  }
+
+  NewEnumParam& add(const std::string& name, EnumConstant& value)
+  {
+    param_->add(name, value);
+    return *this;
+  }
+
+  EnumParam* param() const
+  {
+    return param_;
+  }
+private:
+  EnumParam* param_;
+};
 
 class Configuration
 {
@@ -243,6 +338,13 @@ public:
   Configuration& add(const NewParam<T>& p)
   {
     addParam(p.param());
+
+    return *this;
+  }
+
+  Configuration& add(const NewEnumParam& p)
+  {
+    p.param();
 
     return *this;
   }
