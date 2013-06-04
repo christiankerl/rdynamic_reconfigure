@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
   Configuration config;
 
-  ConfigBuilder(config)
+  config
   .add(NewParam<int>("test_int", t.v0).setDescription("test parameter").setInterval(0, 10))
   .add(NewParam<double>("test_double", t.v1).setDescription("test parameter").setInterval(-10.0, 10.0))
   .add(NewParam<bool>("test_bool", t.v2).setDescription("test parameter").setDefault(true))

@@ -25,6 +25,8 @@
 #define SERVER_H_
 
 #include <ros/ros.h>
+#include <dynamic_reconfigure/Reconfigure.h>
+
 #include <rdynamic_reconfigure/configuration.h>
 
 namespace rdynamic_reconfigure
