@@ -194,8 +194,28 @@ public:
 
   virtual void toParamDescriptionMessage(dynamic_reconfigure::ParamDescription& msg)
   {
+    std::string separator = "";
+
+    std::stringstream edit_method;
+    edit_method << "{'enum_description': '" << name() << "', 'enum': [";
+
+    for(EntryVector::const_iterator it = entries_.begin(); it != entries_.end(); ++it)
+    {
+      edit_method
+        << separator << "{"
+        << "'name': " << "'" << it->name << "',"
+        << "'description': " << "'',"
+        << "'value': " << it->id << ","
+        << "'type': 'int'"
+        << "}";
+
+      separator = ", ";
+    }
+
+    edit_method << "]}";
+
     Param<int>::toParamDescriptionMessage(msg);
-    msg.edit_method = "";
+    msg.edit_method = edit_method.str();
   }
 
   void add(const std::string& name, EnumConstant& value)
@@ -219,41 +239,6 @@ private:
 
   int next_id_;
   EntryVector entries_;
-};
-
-class NewEnumParam
-{
-public:
-  NewEnumParam(std::string name) :
-    param_(new EnumParam())
-  {
-    param_->name_ = name;
-  }
-
-  NewEnumParam& setDescription(const std::string& description)
-  {
-    param_->description_ = description;
-    return *this;
-  }
-
-  NewEnumParam& setDefault(const EnumConstant& value)
-  {
-    param_->default_ = value.id();
-    return *this;
-  }
-
-  NewEnumParam& add(const std::string& name, EnumConstant& value)
-  {
-    param_->add(name, value);
-    return *this;
-  }
-
-  EnumParam* param() const
-  {
-    return param_;
-  }
-private:
-  EnumParam* param_;
 };
 
 class Configuration
@@ -335,19 +320,13 @@ public:
   }
 
   template<typename T>
-  Configuration& add(const NewParam<T>& p)
+  Configuration& add(const T& p)
   {
     addParam(p.param());
 
     return *this;
   }
 
-  Configuration& add(const NewEnumParam& p)
-  {
-    p.param();
-
-    return *this;
-  }
 private:
   dynamic_reconfigure::Group default_grp_;
   dynamic_reconfigure::GroupState default_grp_state_;
@@ -449,7 +428,7 @@ template<typename T>
 class NewParam : public ParamBuilderIntervalConcept<NewParam<T>, T, TypeTraits<T>::IsIntervalType>
 {
 public:
-  NewParam(std::string name, ParamRef<T>& param) :
+  NewParam(const std::string& name, ParamRef<T>& param) :
     param_(new Param<T>())
   {
     param.bind(param_);
@@ -484,6 +463,43 @@ protected:
     param_->max_ = max;
   }
 };
+
+class NewEnumParam
+{
+public:
+  NewEnumParam(const std::string& name, ParamRef<int>& param) :
+    param_(new EnumParam())
+  {
+    param.bind(param_);
+    param_->name_ = name;
+  }
+
+  NewEnumParam& setDescription(const std::string& description)
+  {
+    param_->description_ = description;
+    return *this;
+  }
+
+  NewEnumParam& setDefault(const EnumConstant& value)
+  {
+    param_->default_ = value.id();
+    return *this;
+  }
+
+  NewEnumParam& add(const std::string& name, EnumConstant& value)
+  {
+    param_->add(name, value);
+    return *this;
+  }
+
+  EnumParam* param() const
+  {
+    return param_;
+  }
+private:
+  EnumParam* param_;
+};
+
 
 } /* namespace rdynamic_reconfigure */
 #endif /* CONFIGURATION_H_ */
